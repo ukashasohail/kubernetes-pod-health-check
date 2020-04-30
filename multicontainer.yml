@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multicontainer-pod
+spec:
+  containers:
+  - name: producer
+    image: ubuntu
+    command: ["/bin/bash"]
+    args: ["-c", "while true; do echo $(hostname) $(date) >> /var/log/index.html; sleep 10; done"]
+    volumeMounts: # second this
+    - name: webcontent
+      mountPath: /var/log
+  - name: consumer
+    image: nginx
+    ports:
+      - containerPort: 80
+    volumeMounts: # 3rd this
+    - name: webcontent
+      mountPath: /usr/share/nginx/html
+  volumes:  # first this
+  - name: webcontent 
+    emptyDir: {}  #when data is written locally, no persistancy 
